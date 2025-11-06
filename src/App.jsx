@@ -9,6 +9,7 @@ function App() {
   const [inputValue, setInputValue] = useState('')
   const [showCelebration, setShowCelebration] = useState(false)
   const [todayDate, setTodayDate] = useState('')
+  const [showAbout, setShowAbout] = useState(false)
   const timersRef = useRef({})
   const celebrationTimeoutRef = useRef(null)
   const fileInputRef = useRef(null)
@@ -289,6 +290,68 @@ function App() {
     return confetti
   }
 
+  if (showAbout) {
+    return (
+      <div className="app">
+        <div className="container">
+          <div className="about-header">
+            <button className="back-button" onClick={() => setShowAbout(false)}>
+              ← 戻る
+            </button>
+          </div>
+          <h1 className="about-title">About PomoTODO</h1>
+          
+          <section className="about-section">
+            <h2>📝 アプリについて</h2>
+            <p>PomoTODOは、ポモドーロテクニックを活用したTODO管理アプリです。タスクごとにポモドーロタイマーを設定し、効率的に作業を進めることができます。</p>
+          </section>
+
+          <section className="about-section">
+            <h2>👤 作者</h2>
+            <p><strong>qnosuke</strong></p>
+            <div className="about-links">
+              <a href="https://github.com/qnosuke/pomotodo" target="_blank" rel="noopener noreferrer">
+                📦 GitHub Repository
+              </a>
+              <a href="https://buymeacoffee.com/qnosuke" target="_blank" rel="noopener noreferrer">
+                ☕ Buy me a coffee
+              </a>
+            </div>
+          </section>
+
+          <section className="about-section">
+            <h2>🔄 アップデート履歴</h2>
+            <div className="update-history">
+              <div className="update-item">
+                <div className="update-version">v0.1</div>
+                <div className="update-date">2025-11-06</div>
+                <ul className="update-list">
+                  <li>初回リリース</li>
+                  <li>TODO追加・削除・完了機能</li>
+                  <li>ポモドーロタイマー（25分作業/5分休憩）</li>
+                  <li>ポモドーロ見積もり機能</li>
+                  <li>進捗表示（完了数/総数、パーセント）</li>
+                  <li>シングルタイマーモード</li>
+                  <li>全タスク完了時のお祝い演出</li>
+                  <li>ICSファイル読み込み機能</li>
+                  <li>今日の日付表示</li>
+                  <li>localStorageでデータ永続化</li>
+                  <li>Buy Me a Coffeeウィジェット追加</li>
+                  <li>Aboutページ追加</li>
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          <section className="about-section">
+            <h2>📄 ライセンス</h2>
+            <p>MIT License</p>
+          </section>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className={`app ${showCelebration ? 'celebration-mode' : ''}`}>
       {showCelebration && (
@@ -302,6 +365,11 @@ function App() {
           </div>
         </div>
       )}
+      <div className="header-bar">
+        <button className="about-tab" onClick={() => setShowAbout(true)}>
+          About
+        </button>
+      </div>
       <div className="container">
         <h1 className="title">🍅 PomoTODO</h1>
         <div className="today-date">{todayDate}</div>
