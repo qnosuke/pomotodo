@@ -50,7 +50,7 @@ describe('App', () => {
   test('アプリが正常にレンダリングされる', () => {
     render(<App />);
     
-    expect(screen.getByText('🍅 PomoTODO')).toBeInTheDocument();
+    expect(screen.getByText('🍅 POMO')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('新しいタスクを入力...')).toBeInTheDocument();
     expect(screen.getByText('追加')).toBeInTheDocument();
   });
@@ -201,7 +201,7 @@ describe('App', () => {
     const aboutButton = screen.getByText('About');
     await user.click(aboutButton);
     
-    expect(screen.getByText('About PomoTODO')).toBeInTheDocument();
+    expect(screen.getByText('About POMO')).toBeInTheDocument();
     expect(screen.getByText('📝 アプリについて')).toBeInTheDocument();
     expect(screen.getByText('👤 作者')).toBeInTheDocument();
   });
@@ -218,7 +218,7 @@ describe('App', () => {
     const backButton = screen.getByText('← 戻る');
     await user.click(backButton);
     
-    expect(screen.getByText('🍅 PomoTODO')).toBeInTheDocument();
+    expect(screen.getByText('🍅 POMO')).toBeInTheDocument();
   });
 
   test('ICSファイル読み込みボタンが表示される', () => {

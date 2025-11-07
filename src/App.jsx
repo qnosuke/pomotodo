@@ -278,11 +278,11 @@ function App() {
               ← 戻る
             </button>
           </div>
-          <h1 className="about-title">About PomoTODO</h1>
+          <h1 className="about-title">About POMO</h1>
           
           <section className="about-section">
             <h2>📝 アプリについて</h2>
-            <p>PomoTODOは、ポモドーロテクニックを活用したTODO管理アプリです。タスクごとにポモドーロタイマーを設定し、効率的に作業を進めることができます。</p>
+            <p>POMOは、ポモドーロテクニックを活用したTODO管理アプリです。タスクごとにポモドーロタイマーを設定し、効率的に作業を進めることができます。</p>
           </section>
 
           <section className="about-section">
@@ -350,7 +350,7 @@ function App() {
         </button>
       </div>
       <div className="container">
-        <h1 className="title">🍅 PomoTODO</h1>
+        <h1 className="title">🍅 POMO</h1>
         <div className="today-date">{todayDate}</div>
         
         {totalTodos > 0 && (
