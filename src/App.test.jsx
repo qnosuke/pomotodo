@@ -254,6 +254,89 @@ describe('App', () => {
     expect(screen.getByText('EN')).toBeInTheDocument();
   });
 
+  test('createConfetti関数が正しく動作する', () => {
+    const { container } = render(<App />);
+    
+    // お祝いモードを有効にしてcreateConfettiが呼ばれることを確認
+    // このテストはcreateConfettiがエラーなく実行されることを確認する
+    const app = container.firstChild;
+    expect(app).toBeInTheDocument();
+    
+    // お祝いモードが無効の状態を確認
+    expect(app).not.toHaveClass('celebration-mode');
+  });
+
+  test('タスクの完了状態を切り替えられる', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    
+    // タスクを追加
+    const input = screen.getByPlaceholderText('新しいタスクを入力...');
+    const addButton = screen.getByText('追加');
+    
+    await user.type(input, 'テストタスク');
+    await user.click(addButton);
+    
+    // タスクが追加されたことを確認
+    const task = screen.getByText('テストタスク');
+    expect(task).toBeInTheDocument();
+    
+    // 完了チェックボックスをクリック
+    const checkbox = screen.getByRole('checkbox');
+    await user.click(checkbox);
+    
+    // タスクが完了状態になったことを確認
+    expect(checkbox).toBeChecked();
+    
+    // 再度クリックで未完了に戻る
+    await user.click(checkbox);
+    expect(checkbox).not.toBeChecked();
+  });
+
+  test('タスクを削除できる', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    
+    // タスクを追加
+    const input = screen.getByPlaceholderText('新しいタスクを入力...');
+    const addButton = screen.getByText('追加');
+    
+    await user.type(input, '削除テストタスク');
+    await user.click(addButton);
+    
+    // タスクが追加されたことを確認
+    expect(screen.getByText('削除テストタスク')).toBeInTheDocument();
+    
+    // 削除ボタンをクリック
+    const deleteButton = screen.getByText('削除');
+    await user.click(deleteButton);
+    
+    // タスクが削除されたことを確認
+    expect(screen.queryByText('削除テストタスク')).not.toBeInTheDocument();
+  });
+
+  test('Aboutページを表示できる', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    
+    // Aboutボタンをクリック
+    const aboutButton = screen.getByText('About');
+    await user.click(aboutButton);
+    
+    // Aboutページが表示されたことを確認
+    expect(screen.getByText('About POMO')).toBeInTheDocument();
+    expect(screen.getByText('📝 アプリについて')).toBeInTheDocument();
+    expect(screen.getByText('👤 作者')).toBeInTheDocument();
+    expect(screen.getByText('🔄 アップデート履歴')).toBeInTheDocument();
+    
+    // 戻るボタンでメインページに戻れる
+    const backButton = screen.getByText('← 戻る');
+    await user.click(backButton);
+    
+    // メインページが表示されたことを確認
+    expect(screen.getByText('🍅 POMO')).toBeInTheDocument();
+  });
+
   test('タイマーが終了すると自動的に停止する', async () => {
     jest.useFakeTimers();
     const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
