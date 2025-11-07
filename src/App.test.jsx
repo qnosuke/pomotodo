@@ -53,6 +53,8 @@ describe('App', () => {
     expect(screen.getByText('🍅 POMO')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('新しいタスクを入力...')).toBeInTheDocument();
     expect(screen.getByText('追加')).toBeInTheDocument();
+    expect(screen.getByText('EN')).toBeInTheDocument();
+    expect(screen.getByText('About')).toBeInTheDocument();
   });
 
   test('新しいTODOを追加できる', async () => {
@@ -225,6 +227,31 @@ describe('App', () => {
     render(<App />);
     
     expect(screen.getByText('📅 ICSファイルから今日のTODOを読み込む')).toBeInTheDocument();
+  });
+
+  test('言語切り替えが機能する', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    
+    // 初期状態は日本語
+    expect(screen.getByPlaceholderText('新しいタスクを入力...')).toBeInTheDocument();
+    expect(screen.getByText('追加')).toBeInTheDocument();
+    expect(screen.getByText('EN')).toBeInTheDocument();
+    
+    // 言語切り替えボタンをクリック
+    const languageButton = screen.getByText('EN');
+    await user.click(languageButton);
+    
+    // 英語に切り替わったことを確認
+    expect(screen.getByPlaceholderText('Enter a new task...')).toBeInTheDocument();
+    expect(screen.getByText('Add')).toBeInTheDocument();
+    expect(screen.getByText('日本語')).toBeInTheDocument();
+    
+    // 再度クリックで日本語に戻る
+    await user.click(screen.getByText('日本語'));
+    expect(screen.getByPlaceholderText('新しいタスクを入力...')).toBeInTheDocument();
+    expect(screen.getByText('追加')).toBeInTheDocument();
+    expect(screen.getByText('EN')).toBeInTheDocument();
   });
 
   test('タイマーが終了すると自動的に停止する', async () => {
