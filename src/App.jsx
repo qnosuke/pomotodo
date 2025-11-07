@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import './App.css'
+import { formatTime, parseICSFile } from './utils'
 
 const WORK_TIME = 25 * 60 // 25分（秒）
 const BREAK_TIME = 5 * 60 // 5分（秒）
@@ -13,6 +14,7 @@ function App() {
   const timersRef = useRef({})
   const celebrationTimeoutRef = useRef(null)
   const fileInputRef = useRef(null)
+  const audioRef = useRef(null)
 
   useEffect(() => {
     // 今日の日付を設定
@@ -140,18 +142,29 @@ function App() {
         const newRemainingTime = todo.remainingTime - 1
 
         if (newRemainingTime <= 0) {
+          // タイマー終了時に音声を再生
+          playNotificationSound()
+          
+          // タイマーを自動停止
+          if (timersRef.current[id]) {
+            clearInterval(timersRef.current[id])
+            delete timersRef.current[id]
+          }
+          
           if (todo.currentPhase === 'work') {
             return {
               ...todo,
               completedPomodoros: todo.completedPomodoros + 1,
               currentPhase: 'break',
-              remainingTime: BREAK_TIME
+              remainingTime: BREAK_TIME,
+              isRunning: false
             }
           } else {
             return {
               ...todo,
               currentPhase: 'work',
-              remainingTime: WORK_TIME
+              remainingTime: WORK_TIME,
+              isRunning: false
             }
           }
         }
@@ -192,62 +205,27 @@ function App() {
     }
   }
 
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60)
-    const secs = seconds % 60
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
-  }
-
-  const parseICSFile = (content) => {
-    const todos = []
-    const today = new Date()
-    const todayStr = today.toISOString().split('T')[0].replace(/-/g, '')
-
-    const vtodoBlocks = content.split('BEGIN:VTODO').slice(1)
-
-    vtodoBlocks.forEach(block => {
-      const lines = block.split('\n')
-      let summary = ''
-      let dueDate = ''
-      let status = ''
-      let description = ''
-
-      lines.forEach(line => {
-        if (line.startsWith('SUMMARY:')) {
-          summary = line.substring(8).trim()
-        } else if (line.startsWith('DUE;VALUE=DATE:')) {
-          dueDate = line.substring(15).trim()
-        } else if (line.startsWith('STATUS:')) {
-          status = line.substring(7).trim()
-        } else if (line.startsWith('DESCRIPTION:')) {
-          description = line.substring(12).trim()
-        }
-      })
-
-      // 今日の日付のTODOのみ、かつ未完了のもの
-      if (dueDate === todayStr && status !== 'COMPLETED' && summary) {
-        // 時間情報からポモドーロ数を推定
-        let estimatedPomodoros = 1
-        const timeMatch = description.match(/PT(\d+)H/)
-        if (timeMatch) {
-          const hours = parseInt(timeMatch[1])
-          estimatedPomodoros = Math.ceil(hours * 2) // 1時間 = 2ポモドーロ
-        }
-
-        todos.push({
-          id: Date.now() + Math.random(),
-          text: summary,
-          completed: false,
-          estimatedPomodoros: estimatedPomodoros,
-          completedPomodoros: 0,
-          remainingTime: WORK_TIME,
-          currentPhase: 'work',
-          isRunning: false
-        })
-      }
-    })
-
-    return todos
+  const playNotificationSound = () => {
+    try {
+      // Web Audio APIを使用して音を生成
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)()
+      const oscillator = audioContext.createOscillator()
+      const gainNode = audioContext.createGain()
+      
+      oscillator.connect(gainNode)
+      gainNode.connect(audioContext.destination)
+      
+      oscillator.frequency.value = 800
+      oscillator.type = 'sine'
+      
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime)
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1)
+      
+      oscillator.start(audioContext.currentTime)
+      oscillator.stop(audioContext.currentTime + 1)
+    } catch (error) {
+      console.warn('音声通知の再生に失敗しました:', error)
+    }
   }
 
   const handleFileUpload = (event) => {
@@ -260,7 +238,8 @@ function App() {
       const newTodos = parseICSFile(content)
       
       if (newTodos.length > 0) {
-        setTodos([...newTodos, ...todos])
+        // 既存のタスクをクリアして新しいタスクを設定
+        setTodos(newTodos)
         alert(`${newTodos.length}件の今日のTODOを読み込みました！`)
       } else {
         alert('今日のTODOが見つかりませんでした。')
