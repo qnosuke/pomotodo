@@ -482,7 +482,11 @@ function App() {
                 <div className="timer-section">
                   <div className={`timer-display ${todo.currentPhase}`}>
                     <span className="phase-label">
-                      {todo.currentPhase === 'work' ? '🔥 作業中' : '☕ 休憩中'}
+                      {todo.isRunning ? (
+                        todo.currentPhase === 'work' ? '🔥 作業中' : '☕ 休憩中'
+                      ) : (
+                        todo.currentPhase === 'work' ? '作業' : '休憩'
+                      )}
                       {todo.isRunning && <span className="working-indicator"> (作業中)</span>}
                     </span>
                     <span className="timer-time">{formatTime(todo.remainingTime)}</span>
