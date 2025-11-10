@@ -480,6 +480,8 @@ function App() {
                 </div>
 
                 <div className="timer-section">
+                  {/* デバッグ用ログ */}
+                  {console.log(`Todo ID: ${todo.id}, isRunning: ${todo.isRunning}, currentPhase: ${todo.currentPhase}`)}
                   <div className={`timer-display ${todo.currentPhase}`}>
                     <span className="phase-label">
                       {todo.isRunning ? (
